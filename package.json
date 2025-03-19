@@ -1,0 +1,163 @@
+{
+  "name": "processchart_gen",
+  "productName": "業務プロセス可視化・改善ツール",
+  "version": "1.0.0",
+  "description": "業務プロセス可視化・改善ツール - JMA方式の工程分析記号を用いた業務改善アプリケーション",
+  "author": "Your Organization",
+  "license": "MIT",
+  "main": "electron/main.js",
+  "homepage": "./",
+  "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "electron:dev": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:build": "npm run build && electron-builder build --win --mac --linux -c.extraMetadata.main=electron/main.js",
+    "electron:build:win": "npm run build && electron-builder build --win -c.extraMetadata.main=electron/main.js",
+    "electron:build:mac": "npm run build && electron-builder build --mac -c.extraMetadata.main=electron/main.js",
+    "electron:build:linux": "npm run build && electron-builder build --linux -c.extraMetadata.main=electron/main.js",
+    "release": "npm run build && electron-builder build --win --mac --linux -c.extraMetadata.main=electron/main.js --publish always",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.1",
+    "@mui/material": "^5.15.1",
+    "chart.js": "^4.4.1",
+    "html-to-image": "^1.11.11",
+    "nedb": "^1.8.0",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.2.0",
+    "react-flow-renderer": "^10.3.17",
+    "react-scripts": "5.0.1",
+    "reactflow": "^11.10.1",
+    "uuid": "^9.0.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "electron-devtools-installer": "^3.2.0",
+    "electron-reload": "^2.0.0-alpha.1",
+    "electron-store": "^8.1.0",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.yourorganization.process-analyzer",
+    "productName": "業務プロセス可視化・改善ツール",
+    "files": [
+      "build/**/*",
+      "electron/**/*",
+      "assets/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "extraResources": [
+      {
+        "from": "assets/templates",
+        "to": "templates",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.business",
+      "icon": "assets/icons/icon.icns",
+      "darkModeSupport": true,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "assets/icons/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "icon": "assets/icons/icon.png",
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Office",
+      "desktop": {
+        "Name": "業務プロセス可視化・改善ツール",
+        "Comment": "JMA方式工程分析による業務改善アプリケーション",
+        "Categories": "Office;ProjectManagement"
+      }
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "license": "LICENSE.txt",
+      "deleteAppDataOnUninstall": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "業務プロセス可視化・改善ツール"
+    },
+    "dmg": {
+      "background": "assets/dmg-background.png",
+      "icon": "assets/icons/icon.icns",
+      "iconSize": 100,
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "contents": [
+        {
+          "x": 130,
+          "y": 150
+        },
+        {
+          "x": 410,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "asar": true
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

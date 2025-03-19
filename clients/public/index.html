@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1976d2" />
+    <meta
+      name="description"
+      content="業務プロセス可視化・改善ツール - JMA方式の工程分析記号を使用したプロセスチャートを作成し、業務時間の年換算と業務改善策の提示を行うアプリケーション"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>業務プロセス可視化・改善ツール</title>
+    <!-- Roboto フォントの読み込み (Material-UI 用) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <!-- Material Iconsの読み込み -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  </head>
+  <body>
+    <noscript>このアプリケーションを実行するには、JavaScriptを有効にする必要があります。</noscript>
+    <div id="root"></div>
+    <!-- アプリケーションのバージョン情報 -->
+    <script>
+      // アプリケーションメタデータ
+      window.APP_VERSION = '1.0.0';
+      window.APP_ENV = '%NODE_ENV%';
+      
+      // Electron環境の検出
+      window.isElectron = () => {
+        return navigator.userAgent.toLowerCase().indexOf('electron/') > -1;
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,166 @@
+/* src/styles/global.css */
+
+/* 全体のボックスサイジングをborder-boxに */
+* {
+    box-sizing: border-box;
+  }
+  
+  /* ルート要素のサイズを設定 */
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+      Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* スクロールバーのスタイル */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a0a0a0;
+  }
+  
+  /* ReactFlowスタイルのカスタマイズ */
+  .react-flow__node {
+    border-radius: 4px;
+    transition: box-shadow 0.2s ease;
+  }
+  
+  .react-flow__node.selected,
+  .react-flow__node:focus {
+    box-shadow: 0 0 0 2px #3182ce;
+  }
+  
+  .react-flow__handle {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .react-flow__handle-left {
+    left: -4px;
+  }
+  
+  .react-flow__handle-right {
+    right: -4px;
+  }
+  
+  /* プロセスチャートノードスタイル */
+  .process-node {
+    width: 120px;
+  }
+  
+  .inspection-node {
+    width: 120px;
+  }
+  
+  .transport-node {
+    width: 120px;
+  }
+  
+  .delay-node {
+    width: 120px;
+  }
+  
+  .storage-node {
+    width: 120px;
+  }
+  
+  /* ノードコンテンツスタイル */
+  .node-content {
+    padding: 10px;
+    text-align: center;
+    user-select: none;
+  }
+  
+  /* ノードドラッグ時のスタイル */
+  .dragging {
+    opacity: 0.8;
+    cursor: grabbing;
+  }
+  
+  /* ノードが改善ポイントとしてハイライトされているときのスタイル */
+  .highlighted {
+    border: 2px solid #e53e3e !important;
+    background-color: rgba(229, 62, 62, 0.1);
+    box-shadow: 0 0 8px rgba(229, 62, 62, 0.5);
+  }
+  
+  /* ダッシュボードカードのスタイル */
+  .dashboard-card {
+    transition: all 0.3s ease;
+  }
+  
+  .dashboard-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  
+  /* 印刷時のスタイル */
+  @media print {
+    body {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      background-color: white;
+    }
+    
+    .no-print {
+      display: none !important;
+    }
+    
+    .print-only {
+      display: block !important;
+    }
+    
+    .react-flow__controls {
+      display: none !important;
+    }
+  }
+  
+  /* アニメーション */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.3s ease-in;
+  }
+  
+  .icon-spin {
+    animation: spin 2s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
