@@ -2,12 +2,14 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const isDev = process.env.NODE_ENV === 'development';
+// 強制的に開発モードを有効にする
+const isDev = true; // process.env.NODE_ENV === 'development';
 const Datastore = require('nedb');
 const electronStore = require('electron-store');
 const appInitializer = require('./init');
 const menu = require('./menu');
 const ipcHandlers = require('./ipc-handlers');
+const splash = require('./splash');
 
 // アプリケーション設定用ストアの初期化
 const appConfig = new electronStore({
@@ -52,7 +54,9 @@ async function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      webSecurity: true,
+      sandbox: false
     },
     show: false, // 準備が整うまでウィンドウを非表示
     icon: path.join(__dirname, 'icons', 'icon.png')
@@ -67,18 +71,29 @@ async function createWindow() {
   // 開発環境では開発サーバーを使用、本番環境ではビルドされたファイルを使用
   const startUrl = isDev
     ? 'http://localhost:3000'
-    : `file://${path.join(__dirname, '../build/index.html')}`;
+    : `file://${path.join(__dirname, '../clients/public/index.html')}`;
 
-  await mainWindow.loadURL(startUrl);
+  try {
+    console.log(`URL をロードします: ${startUrl}`);
+    await mainWindow.loadURL(startUrl);
+  } catch (loadError) {
+    console.error('URL のロードに失敗しました:', loadError);
+    splash.updateStatus(`ロードエラー: ${loadError.message}`);
+    
+    // エラーページを表示
+    await mainWindow.loadFile(path.join(__dirname, 'error.html'));
+  }
 
   // 開発環境のみDevToolsを開く
   if (isDev) {
     mainWindow.webContents.openDevTools();
   }
 
-  // コンテンツのロードが完了したら表示
+  // コンテンツのロードが完了したら表示し、スプラッシュスクリーンを閉じる
   mainWindow.once('ready-to-show', () => {
+    console.log('メインウィンドウの表示準備完了');
     mainWindow.show();
+    splash.close(500); // 500ms後にスプラッシュスクリーンを閉じる
   });
 
   // ウィンドウが閉じられたときの処理
@@ -92,6 +107,16 @@ async function createWindow() {
       e.preventDefault();
       mainWindow.hide();
     }
+  });
+  
+  // ロードエラー時のハンドリング
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error(`ページのロードに失敗しました: ${errorDescription} (${errorCode})`);
+    splash.updateStatus(`ロードエラー: ${errorDescription}`);
+    
+    // エラーページを表示する代わりにスプラッシュ画面を閉じる
+    splash.close(0);
+    mainWindow.show();
   });
 }
 
@@ -200,7 +225,7 @@ app.whenReady().then(async () => {
   menu.setup(mainWindow);
 
   // IPC通信ハンドラーの設定
-  ipcHandlers.setup(mainWindow);
+  ipcHandlers.setupIpcHandlers(mainWindow);
 
   // macOSではウィンドウが閉じられても再度開くことが可能
   app.on('activate', () => {

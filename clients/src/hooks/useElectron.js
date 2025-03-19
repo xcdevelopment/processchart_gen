@@ -408,17 +408,6 @@ export function useElectron() {
     }
   }, [isElectron]);
 
-  // メニューイベントのリスナーを設定するフック
-  const useMenuListener = useCallback((eventName, callback) => {
-    useEffect(() => {
-      if (!isElectron || !window.electron.onMenuEvent) {
-        return undefined;
-      }
-      
-      return window.electron.onMenuEvent(eventName, callback);
-    }, [eventName, callback]);
-  }, [isElectron]);
-
   // 公開するAPIとステート
   return {
     isElectron,
@@ -431,8 +420,12 @@ export function useElectron() {
     saveImprovement,
     getSetting,
     setSetting,
-    useMenuListener
+    addMenuListener: (eventName, callback) => {
+      if (!isElectron || !window.electron.onMenuEvent) {
+        return undefined;
+      }
+      
+      return window.electron.onMenuEvent(eventName, callback);
+    }
   };
 }
-
-export default useElectron;

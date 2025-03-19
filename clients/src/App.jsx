@@ -36,6 +36,7 @@ import Dashboard from './components/Dashboard';
 import ImprovementManager from './components/ImprovementManager';
 import CSVImportExport from './components/CSVImportExport';
 import Settings from './components/Settings';
+import { ProjectProvider } from './contexts/ProjectContext';
 
 // サービスのインポート
 import { TimeCalculationService } from './services/timeCalculation';
@@ -412,7 +413,7 @@ const App = () => {
 
   // Electronメニューイベントのハンドラー
   const menuHandlers = {
-    onNewProject: openNewProjectDialog,
+    onNewProject: () => openNewProjectDialog(),
     onSaveProject: () => saveProject(false),
     onSaveProjectAs: () => saveProject(true),
     onExportCsv: handleExportCsv,
@@ -425,139 +426,158 @@ const App = () => {
     onProjectOpened: handleProjectOpened
   };
   
-  // Electronメニューイベントリスナーの設定
-  ElectronMenuService.useMenuListeners(menuHandlers);
+  // useEffect内でメニューリスナーを設定
+  useEffect(() => {
+    // メニューイベントのリスナーを設定
+    const menuListeners = ElectronMenuService.createMenuEventListeners(menuHandlers);
+    const cleanup = menuListeners.setup();
+    
+    // クリーンアップ関数を返す
+    return cleanup;
+  }, [menuHandlers]);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      
-      {/* アプリバー */}
-      <AppBar position="fixed">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            業務プロセス分析・改善ツール
-          </Typography>
+      <ProjectProvider>
+        {/* ヘッダー */}
+        <AppBar position="fixed">
+          <Toolbar>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              {currentProject.name} {isModified ? '*' : ''}
+            </Typography>
+            
+            <Button
+              color="inherit"
+              onClick={openNewProjectDialog}
+              sx={{ mr: 1 }}
+            >
+              新規
+            </Button>
+            
+            <Button
+              color="inherit"
+              onClick={() => DatabaseService.openProject(handleProjectOpened)}
+              sx={{ mr: 1 }}
+            >
+              開く
+            </Button>
+            
+            <Button
+              color="inherit"
+              startIcon={<SaveIcon />}
+              onClick={() => saveProject(false)}
+            >
+              保存
+            </Button>
+          </Toolbar>
           
-          <Typography variant="subtitle1" sx={{ mr: 2 }}>
-            {currentProject.name} {isModified && '*'}
-          </Typography>
-          
-          <Button
-            color="inherit"
-            startIcon={<SaveIcon />}
-            onClick={() => saveProject(false)}
+          <Tabs
+            value={tabIndex}
+            onChange={handleTabChange}
+            variant="fullWidth"
+            sx={{ backgroundColor: '#f5f5f5', color: 'text.primary' }}
           >
-            保存
-          </Button>
-        </Toolbar>
+            <Tab icon={<AccountTreeIcon />} label="プロセスチャート" />
+            <Tab icon={<TimelineIcon />} label="工数分析" />
+            <Tab icon={<LightbulbIcon />} label="改善提案" />
+            <Tab icon={<SettingsIcon />} label="設定" />
+          </Tabs>
+        </AppBar>
         
-        <Tabs
-          value={tabIndex}
-          onChange={handleTabChange}
-          variant="fullWidth"
-          sx={{ backgroundColor: '#f5f5f5', color: 'text.primary' }}
-        >
-          <Tab icon={<AccountTreeIcon />} label="プロセスチャート" />
-          <Tab icon={<TimelineIcon />} label="工数分析" />
-          <Tab icon={<LightbulbIcon />} label="改善提案" />
-          <Tab icon={<SettingsIcon />} label="設定" />
-        </Tabs>
-      </AppBar>
-      
-      {/* メインコンテンツ */}
-      <Container maxWidth="xl" sx={{ mt: 10, mb: 4 }}>
-        <Box sx={{ pt: 4 }}>
-          {/* タブコンテンツ */}
-          {tabIndex === 0 && (
-            <ProcessChart 
-              initialNodes={processSteps}
-              onChange={handleProcessStepsChange}
-            />
-          )}
-          
-          {tabIndex === 1 && (
-            <Dashboard 
-              workloadData={improvementResults?.after || workloadData}
-              originalWorkload={workloadData}
-              improvementResults={improvementResults}
-            />
-          )}
-          
-          {tabIndex === 2 && (
-            <ImprovementManager 
-              processSteps={processSteps}
-              currentWorkload={workloadData}
-              onApplyImprovements={handleApplyImprovements}
-            />
-          )}
-          
-          {tabIndex === 3 && (
-            <Box>
-              <Typography variant="h4" gutterBottom>
-                設定
-              </Typography>
-              
-              <CSVImportExport 
+        {/* メインコンテンツ */}
+        <Container maxWidth="xl" sx={{ mt: 10, mb: 4 }}>
+          <Box sx={{ pt: 4 }}>
+            {/* タブコンテンツ */}
+            {tabIndex === 0 && (
+              <ProcessChart 
+                initialNodes={processSteps}
+                onChange={handleProcessStepsChange}
+              />
+            )}
+            
+            {tabIndex === 1 && (
+              <Dashboard 
+                workloadData={improvementResults?.after || workloadData}
+                originalWorkload={workloadData}
+                improvementResults={improvementResults}
+              />
+            )}
+            
+            {tabIndex === 2 && (
+              <ImprovementManager 
                 processSteps={processSteps}
-                onImport={handleProcessStepsChange}
+                currentWorkload={workloadData}
+                onApplyImprovements={handleApplyImprovements}
               />
-              
-              <Settings 
-                currentProject={currentProject}
-                onProjectChange={(project) => {
-                  setCurrentProject(project);
-                  setIsModified(true);
-                }}
-              />
-            </Box>
-          )}
-        </Box>
-      </Container>
-      
-      {/* 新規プロジェクトダイアログ */}
-      <Dialog open={newProjectDialogOpen} onClose={() => setNewProjectDialogOpen(false)}>
-        <DialogTitle>新規プロジェクト</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="プロジェクト名"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={newProjectName}
-            onChange={(e) => setNewProjectName(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="説明（オプション）"
-            type="text"
-            fullWidth
-            multiline
-            rows={3}
-            variant="outlined"
-            value={newProjectDescription}
-            onChange={(e) => setNewProjectDescription(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setNewProjectDialogOpen(false)}>キャンセル</Button>
-          <Button onClick={createNewProject} variant="contained">作成</Button>
-        </DialogActions>
-      </Dialog>
-      
-      {/* スナックバー通知 */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+            )}
+            
+            {tabIndex === 3 && (
+              <Box>
+                <Typography variant="h4" gutterBottom>
+                  設定
+                </Typography>
+                
+                <CSVImportExport 
+                  processSteps={processSteps}
+                  onImport={handleProcessStepsChange}
+                />
+                
+                <Settings 
+                  currentProject={currentProject}
+                  onProjectChange={(project) => {
+                    setCurrentProject(project);
+                    setIsModified(true);
+                  }}
+                />
+              </Box>
+            )}
+          </Box>
+        </Container>
+        
+        {/* 新規プロジェクトダイアログ */}
+        <Dialog open={newProjectDialogOpen} onClose={() => setNewProjectDialogOpen(false)}>
+          <DialogTitle>新規プロジェクト</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="プロジェクト名"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={newProjectName}
+              onChange={(e) => setNewProjectName(e.target.value)}
+            />
+            <TextField
+              margin="dense"
+              label="説明（オプション）"
+              type="text"
+              fullWidth
+              multiline
+              rows={3}
+              variant="outlined"
+              value={newProjectDescription}
+              onChange={(e) => setNewProjectDescription(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setNewProjectDialogOpen(false)}>キャンセル</Button>
+            <Button onClick={createNewProject} variant="contained">作成</Button>
+          </DialogActions>
+        </Dialog>
+        
+        {/* スナックバー通知 */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={5000}
+          onClose={handleSnackbarClose}
+        >
+          <Alert onClose={handleSnackbarClose} severity={snackbar.severity}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </ProjectProvider>
     </ThemeProvider>
   );
 };

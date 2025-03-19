@@ -23,6 +23,9 @@ function setupIpcHandlers(mainWindow) {
   
   // アプリケーション設定ハンドラ
   setupSettingsHandlers();
+
+  // デバッグ関連のハンドラー
+  setupDebugHandlers(mainWindow);
 }
 
 /**
@@ -352,6 +355,38 @@ function setupSettingsHandlers() {
       console.error('最近使用したプロジェクトの取得エラー:', error);
       throw new Error(`最近使用したプロジェクトの取得中にエラーが発生しました: ${error.message}`);
     }
+  });
+}
+
+// デバッグ関連のハンドラー
+function setupDebugHandlers(mainWindow) {
+  ipcMain.handle('open-dev-tools', async () => {
+    if (mainWindow) {
+      mainWindow.webContents.openDevTools();
+      return { success: true };
+    }
+    return { success: false, error: 'メインウィンドウが利用できません' };
+  });
+
+  ipcMain.handle('reload-app', async () => {
+    if (mainWindow) {
+      mainWindow.reload();
+      return { success: true };
+    }
+    return { success: false, error: 'メインウィンドウが利用できません' };
+  });
+
+  ipcMain.handle('get-system-info', async () => {
+    return {
+      platform: process.platform,
+      arch: process.arch,
+      nodeVersion: process.versions.node,
+      electronVersion: process.versions.electron,
+      chromeVersion: process.versions.chrome,
+      appVersion: app.getVersion(),
+      appPath: app.getAppPath(),
+      userDataPath: app.getPath('userData')
+    };
   });
 }
 

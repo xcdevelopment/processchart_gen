@@ -9,10 +9,10 @@
   "homepage": "./",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "start": "cd clients && react-scripts start",
+    "build": "cd clients && react-scripts build",
+    "test": "cd clients && react-scripts test",
+    "eject": "cd clients && react-scripts eject",
     "electron:dev": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
     "electron:build": "npm run build && electron-builder build --win --mac --linux -c.extraMetadata.main=electron/main.js",
     "electron:build:win": "npm run build && electron-builder build --win -c.extraMetadata.main=electron/main.js",
@@ -49,10 +49,10 @@
     "wait-on": "^7.2.0"
   },
   "build": {
-    "appId": "com.yourorganization.process-analyzer",
+    "appId": "com.yourorganization.processchart_gen",
     "productName": "業務プロセス可視化・改善ツール",
     "files": [
-      "build/**/*",
+      "public/**/*",
       "electron/**/*",
       "assets/**/*",
       "node_modules/**/*"

@@ -22,29 +22,60 @@ class AppInitializer {
 
     try {
       // ユーザーデータディレクトリの設定
+      console.log('ユーザーデータディレクトリを設定中...');
       await this.setupUserDataDirectories();
       splash.updateProgress(30);
-      splash.updateStatus('データベースを準期化しています...');
+      splash.updateStatus('データベースを初期化しています...');
 
       // データベースの初期化
-      dbManager.initialize();
+      console.log('データベースを初期化中...');
+      try {
+        dbManager.initialize();
+      } catch (dbError) {
+        console.error('データベース初期化エラー:', dbError);
+        splash.updateStatus(`データベースエラー: ${dbError.message}`);
+      }
+      
       splash.updateProgress(50);
       splash.updateStatus('設定を読み込んでいます...');
 
       // アプリケーション設定の初期化
-      await this.setupAppSettings();
+      console.log('アプリケーション設定を初期化中...');
+      try {
+        await this.setupAppSettings();
+      } catch (settingsError) {
+        console.error('設定初期化エラー:', settingsError);
+        splash.updateStatus(`設定エラー: ${settingsError.message}`);
+      }
+      
       splash.updateProgress(70);
       splash.updateStatus('テンプレートを準備しています...');
 
       // テンプレートの初期化
-      await this.setupTemplates();
+      console.log('テンプレートを初期化中...');
+      try {
+        await this.setupTemplates();
+      } catch (templatesError) {
+        console.error('テンプレート初期化エラー:', templatesError);
+        // テンプレートエラーは致命的ではないので続行
+        await this.createDefaultTemplate();
+      }
+      
       splash.updateProgress(90);
       splash.updateStatus('起動準備完了...');
 
       // 開発モードの設定
-      this.setupDevelopmentEnvironment();
+      console.log('開発環境を設定中...');
+      try {
+        this.setupDevelopmentEnvironment();
+      } catch (devError) {
+        console.error('開発環境設定エラー:', devError);
+      }
+      
       splash.updateProgress(100);
-
+      
+      // 正常終了
+      console.log('初期化完了');
       return true;
     } catch (error) {
       console.error('アプリケーションの初期化中にエラーが発生しました:', error);

@@ -40,6 +40,8 @@ import { useProject } from '../contexts/ProjectContext';
  */
 const Settings = (props) => {
   const { currentProject, onProjectChange } = props;
+  
+  // 条件付きでなく最初に呼び出す
   const { 
     isElectron, 
     getSetting, 
@@ -49,14 +51,14 @@ const Settings = (props) => {
 
   // プロジェクト関連の設定
   const [projectSettings, setProjectSettings] = useState({
-    name: currentProject.name || '',
-    description: currentProject.description || '',
+    name: currentProject?.name || '',
+    description: currentProject?.description || '',
     metadata: {
-      author: currentProject.metadata?.author || '',
-      company: currentProject.metadata?.company || '',
-      department: currentProject.metadata?.department || '',
-      version: currentProject.metadata?.version || '1.0.0',
-      tags: (currentProject.metadata?.tags || []).join(', ')
+      author: currentProject?.metadata?.author || '',
+      company: currentProject?.metadata?.company || '',
+      department: currentProject?.metadata?.department || '',
+      version: currentProject?.metadata?.version || '1.0.0',
+      tags: (currentProject?.metadata?.tags || []).join(', ')
     }
   });
 
@@ -122,17 +124,19 @@ const Settings = (props) => {
 
   // プロジェクト設定が変更されたときの処理
   useEffect(() => {
-    setProjectSettings({
-      name: currentProject.name || '',
-      description: currentProject.description || '',
-      metadata: {
-        author: currentProject.metadata?.author || '',
-        company: currentProject.metadata?.company || '',
-        department: currentProject.metadata?.department || '',
-        version: currentProject.metadata?.version || '1.0.0',
-        tags: (currentProject.metadata?.tags || []).join(', ')
-      }
-    });
+    if (currentProject) {
+      setProjectSettings({
+        name: currentProject.name || '',
+        description: currentProject.description || '',
+        metadata: {
+          author: currentProject.metadata?.author || '',
+          company: currentProject.metadata?.company || '',
+          department: currentProject.metadata?.department || '',
+          version: currentProject.metadata?.version || '1.0.0',
+          tags: (currentProject.metadata?.tags || []).join(', ')
+        }
+      });
+    }
   }, [currentProject]);
 
   /**

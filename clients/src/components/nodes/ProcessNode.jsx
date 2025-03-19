@@ -47,6 +47,7 @@ import {
 import { toPng, toSvg } from 'html-to-image';
 
 // カスタムノードコンポーネント
+// 修正: 正しいインポートパスを使用
 import ProcessNode from './ProcessNode';
 import InspectionNode from './InspectionNode';
 import TransportNode from './TransportNode';
@@ -200,10 +201,10 @@ const ProcessChart = ({ initialNodes = [], onChange }) => {
 
   // ノードまたはエッジの選択を処理
   const onSelectionChange = useCallback(({ nodes, edges }) => {
-    if (nodes.length === 1) {
+    if (nodes && nodes.length === 1) {
       setSelectedNode(nodes[0]);
       setSelectedEdge(null);
-    } else if (edges.length === 1) {
+    } else if (edges && edges.length === 1) {
       setSelectedNode(null);
       setSelectedEdge(edges[0]);
     } else {

@@ -16,7 +16,7 @@ const DatabaseService = {
         } else {
           // 開発環境など、Electron以外での動作時はローカルストレージを使用
           console.warn('Electron APIが利用できません。ローカルストレージを使用します。');
-          return useLocalStorageFallback('improvements', query);
+          return findInLocalStorage('improvements', query);
         }
       } catch (error) {
         console.error('改善施策の検索に失敗しました:', error);
@@ -207,7 +207,7 @@ const DatabaseService = {
    * @param {Object} query - 検索クエリ
    * @returns {Array} 検索結果
    */
-  function useLocalStorageFallback(storeName, query) {
+  function findInLocalStorage(storeName, query) {
     try {
       // ローカルストレージからデータを取得
       const storedDataStr = localStorage.getItem(storeName);

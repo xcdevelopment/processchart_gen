@@ -131,6 +131,15 @@ class AppSettings {
   }
 
   /**
+   * 設定キーが存在するかどうかを確認する
+   * @param {string} key - 設定キー
+   * @returns {boolean} 設定が存在するかどうか
+   */
+  has(key) {
+    return this.store.has(key);
+  }
+
+  /**
    * 全ての設定を取得する
    * @returns {Object} 全設定
    */

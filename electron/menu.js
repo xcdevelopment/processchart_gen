@@ -252,4 +252,16 @@ function buildRecentProjectsMenu(mainWindow) {
   }));
 }
 
-module.exports = { createApplicationMenu };
+/**
+ * メニューをセットアップする
+ * @param {BrowserWindow} mainWindow - メインウィンドウ
+ */
+function setup(mainWindow) {
+  const menu = createApplicationMenu(mainWindow);
+  Menu.setApplicationMenu(menu);
+}
+
+module.exports = {
+  setup,
+  createApplicationMenu
+};

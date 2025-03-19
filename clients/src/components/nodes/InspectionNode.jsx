@@ -1,61 +1,33 @@
-// src/components/nodes/DelayNode.jsx
+// src/components/nodes/InspectionNode.jsx
 import React from 'react';
 import { Handle, Position } from 'reactflow';
 import { Box, Typography } from '@mui/material';
 
 /**
- * 停滞（Delay）ノードコンポーネント
- * JMA方式の工程分析において「停滞」を表す三角形ノード
+ * 検査（Inspection）ノードコンポーネント
+ * JMA方式の工程分析において「検査」を表す四角形ノード
  * 
  * @param {Object} props - コンポーネントプロパティ
  * @param {Object} props.data - ノードデータ
  * @param {boolean} props.selected - 選択状態
  * @param {function} props.onClick - クリックハンドラ
  */
-const DelayNode = ({ data, selected, onClick }) => {
-  // コンテナスタイル
-  const containerStyle = {
+const InspectionNode = ({ data, selected, onClick }) => {
+  // 基本スタイル
+  const baseStyle = {
     width: '120px',
-    height: '104px',
-    position: 'relative',
-    cursor: 'pointer'
-  };
-
-  // 三角形スタイル（外側のボーダー）
-  const triangleBorderStyle = {
-    position: 'absolute',
-    width: 0,
-    height: 0,
-    borderLeft: '60px solid transparent',
-    borderRight: '60px solid transparent',
-    borderBottom: selected ? '104px solid rgba(25, 118, 210, 0.1)' : '104px solid white',
-    zIndex: 1
-  };
-
-  // 三角形の枠線
-  const triangleOutlineStyle = {
-    position: 'absolute',
-    width: '120px',
-    height: '104px',
-    clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
+    height: '120px',
     border: selected ? '2px solid #1976d2' : '2px solid #333',
-    backgroundColor: 'transparent',
-    boxSizing: 'border-box',
-    boxShadow: selected ? '0 0 10px rgba(25, 118, 210, 0.5)' : 'none',
-    zIndex: 2
-  };
-
-  // コンテンツスタイル
-  const contentStyle = {
-    position: 'absolute',
-    top: '30px',
-    left: 0,
-    width: '100%',
+    backgroundColor: 'white',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 3
+    alignItems: 'center',
+    padding: '10px',
+    boxShadow: selected ? '0 0 10px rgba(25, 118, 210, 0.5)' : 'none',
+    transition: 'all 0.3s ease',
+    cursor: 'pointer',
+    position: 'relative'
   };
 
   // 時間と頻度の表示
@@ -71,13 +43,10 @@ const DelayNode = ({ data, selected, onClick }) => {
   };
   
   return (
-    <div className="delay-node" onClick={onClick} style={containerStyle}>
+    <div className="inspection-node" onClick={onClick}>
       <Handle type="target" position={Position.Left} style={{ background: '#555' }} />
       
-      <div className="triangle-background" style={triangleBorderStyle}></div>
-      <div className="triangle-outline" style={triangleOutlineStyle}></div>
-      
-      <div className="node-content" style={contentStyle}>
+      <div className="node-content" style={baseStyle}>
         <Typography 
           variant="subtitle1" 
           sx={{ 
@@ -86,7 +55,7 @@ const DelayNode = ({ data, selected, onClick }) => {
             textAlign: 'center',
             mb: 0.5,
             lineHeight: 1.2,
-            maxWidth: '90px',
+            maxWidth: '110px',
             overflow: 'hidden',
             textOverflow: 'ellipsis'
           }}
@@ -116,4 +85,4 @@ const DelayNode = ({ data, selected, onClick }) => {
   );
 };
 
-export default DelayNode;
+export default InspectionNode;

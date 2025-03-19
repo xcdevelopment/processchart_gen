@@ -1,10 +1,13 @@
 // electron/preload.js
 const { contextBridge, ipcRenderer } = require('electron');
 
-// メインプロセスとの安全なIPC通信をエクスポート
+/**
+ * メインプロセスとの安全なIPC通信をレンダラープロセスに公開
+ */
 contextBridge.exposeInMainWorld('electron', {
   // ファイル操作
   saveProject: (data) => ipcRenderer.invoke('save-project', data),
+  openProject: (data) => ipcRenderer.invoke('open-project', data),
   exportCsv: (data) => ipcRenderer.invoke('export-csv', data),
   importCsv: () => ipcRenderer.invoke('import-csv'),
   exportImage: (data) => ipcRenderer.invoke('export-image', data),
@@ -12,6 +15,13 @@ contextBridge.exposeInMainWorld('electron', {
   // データベース操作
   findImprovements: (query) => ipcRenderer.invoke('db-find-improvements', query),
   saveImprovement: (improvement) => ipcRenderer.invoke('db-save-improvement', improvement),
+  saveProjectMeta: (meta) => ipcRenderer.invoke('db-save-project-meta', meta),
+  findProjects: (query) => ipcRenderer.invoke('db-find-projects', query),
+  
+  // 設定関連
+  getSetting: (key, defaultValue) => ipcRenderer.invoke('get-settings', key, defaultValue),
+  setSetting: (key, value) => ipcRenderer.invoke('set-settings', key, value),
+  getRecentProjects: () => ipcRenderer.invoke('get-recent-projects'),
   
   // メニュー関連のイベントリスナー
   onMenuEvent: (channel, callback) => {
@@ -48,5 +58,5 @@ contextBridge.exposeInMainWorld('electron', {
   }
 });
 
-// ノード統合されたElectron APIの代わりにipcRendererを使用することで、
-// セキュリティの向上とコンテキスト分離の維持を実現
+// コンソールで問題を識別しやすくするためのメッセージ
+console.log('Preload script has been loaded');
